@@ -101,7 +101,7 @@ public class MementoUtil {
             Entry<Object, Object[]> en = i.next();
             final Object[] mementoSlot = en.getValue();
             Object mementoObject = mementoSlot[0];
-            pc.getPersister(mementoObject.getClass()).select(mementoObject, new PostSelectedCallback<Object>() {
+            pc.getPersister(Object.class).select(mementoObject, new PostSelectedCallback<>() {
                 @Override
                 public void entitySelected(Object e) {
                     mementoSlot[0] = MementoUtil.this.clone(e);
@@ -122,16 +122,16 @@ public class MementoUtil {
                 Object currentObject = potentiallyChanged.get(mementoEntry.getKey());
                 Object mementoObject = mementoEntry.getValue()[0];
                 if (currentObject == null) {
-                    pc.getPersister(mementoObject.getClass()).delete(mementoObject);
+                    pc.getPersister(Object.class).delete(mementoObject);
                 } else {
                     if (!equals(currentObject, mementoObject)) {
-                        pc.getPersister(mementoObject.getClass()).update(currentObject);
+                        pc.getPersister(Object.class).update(currentObject);
                     }
                 }
             }
             for (Object inserted : this.inserted) {
                 ensureId(null, inserted);
-                pc.getPersister(inserted.getClass()).insert(inserted);
+                pc.getPersister(Object.class).insert(inserted);
             }
         } finally {
             inserted.clear();
@@ -139,7 +139,7 @@ public class MementoUtil {
         }
     }
 
-    static interface IteratorCallback {
+    interface IteratorCallback {
         void operateOn(String memberName, Object o);
     }
 
