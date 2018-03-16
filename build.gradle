@@ -1,21 +1,22 @@
 import groovy.xml.QName
-import org.gradle.api.tasks.wrapper.Wrapper.DistributionType
+
+import java.nio.charset.StandardCharsets
 
 wrapper {
-    gradleVersion = '4.3'
-    distributionType = DistributionType.ALL
+    gradleVersion = '4.6'
+    distributionType = org.gradle.api.tasks.wrapper.Wrapper.DistributionType.ALL
 }
 
 ext {
-	slf4jVersion = "1.7.25"
-	springVersion = '5.0.1.RELEASE'
+	slf4jVersion = "1.7.21"
+	springVersion = '3.1.4.RELEASE'
 	c3p0Version = '0.9.5.2'
-	asmVersion = '6.0'
-	guavaVersion = '23.4-jre'
-	jacksonVersion = '2.9.2'
-	cassandraDriverVersion = '3.3.2'
-	snakeyamlVersion = '1.19'
-	commonsIoVersion = '2.6'
+	asmVersion = '5.0.4'
+	guavaVersion = '19.0'
+	jacksonVersion = '2.8.4'
+	cassandraDriverVersion = '3.1.2'
+	snakeyamlVersion = '1.17'
+	commonsIoVersion = '2.5'
 }
 
 buildscript {
@@ -29,14 +30,14 @@ buildscript {
     dependencies {
         // The nexus plugin makes uploading to Sonatype Nexus repository easier.
         // See https://github.com/bmuschko/gradle-nexus-plugin for documentation
-        classpath 'org.gradle.api.plugins:gradle-nexus-plugin:0.7.1'
+        classpath 'org.gradle.api.plugins:gradle-nexus-plugin:0.7'
         // The nexus-workflow plugin automates the staging/promotion/release process on Sonatype OSS
         // by providing the task 'nexusStagingRelease'.
         // See https://github.com/adaptivecomputing/plugins-gradle/tree/master/nexus-workflow
         // and http://stackoverflow.com/questions/20432907/automated-release-to-maven-central-with-gradle
         classpath 'com.adaptc.gradle:nexus-workflow:0.6'
         // the license plugin, see https://github.com/hierynomus/license-gradle-plugin
-        classpath 'gradle.plugin.nl.javadude.gradle.plugins:license-gradle-plugin:0.14.0'
+        classpath 'gradle.plugin.nl.javadude.gradle.plugins:license-gradle-plugin:0.13.0'
     }
 }
 
@@ -59,12 +60,12 @@ configure(subprojects.findAll {
 
     apply plugin: 'java'
     apply plugin: 'osgi'
-    compileJava.options.encoding = 'utf-8'
-    compileJava.sourceCompatibility = JavaVersion.VERSION_1_9
-    compileJava.targetCompatibility = JavaVersion.VERSION_1_9
-    compileTestJava.options.encoding = 'utf-8'
-    compileTestJava.sourceCompatibility = JavaVersion.VERSION_1_9
-    compileTestJava.targetCompatibility = JavaVersion.VERSION_1_9
+    compileJava.options.encoding = StandardCharsets.UTF_8
+    compileJava.sourceCompatibility = JavaVersion.VERSION_1_8
+    compileJava.targetCompatibility = JavaVersion.VERSION_1_8
+    compileTestJava.options.encoding = StandardCharsets.UTF_8
+    compileTestJava.sourceCompatibility = JavaVersion.VERSION_1_8
+    compileTestJava.targetCompatibility = JavaVersion.VERSION_1_8
 
     apply plugin: 'maven'
     task createSourcesJar(type: Jar, dependsOn: classes) {
@@ -151,8 +152,8 @@ configure(subprojects.findAll {
     eclipse.classpath.defaultOutputDir = new File("$buildDir/classes/main")
 
     dependencies {
-        testCompile 'junit:junit:4.12'
-        testCompile 'org.mockito:mockito-all:2.0.2-beta'
+        testCompile 'junit:junit:4.11'
+        testCompile 'org.mockito:mockito-all:1.9.5'
         compile	"org.slf4j:slf4j-api:$slf4jVersion"
     }
 
@@ -161,7 +162,7 @@ configure(subprojects.findAll {
     }
 
     javadoc {
-        options.encoding = "UTF-8"
+        options.encoding = StandardCharsets.UTF_8
     }
 
     if (project.hasProperty('secretKeyRingFileSourceURL')) {
@@ -281,9 +282,9 @@ project(':projects:copper-regtest') {
         compile fileTree(dir: "$rootDir/3rdPartyLibs", include: '*.jar')
 
         testCompile 'mysql:mysql-connector-java:5.1.25'
-        testCompile 'org.apache.derby:derby:10.14.1.0'
-        testCompile 'postgresql:postgresql:9.1-901-1.jdbc4'
-        testCompile 'com.h2database:h2:1.4.196'
+        testCompile 'org.apache.derby:derby:10.13.1.1'
+        testCompile 'postgresql:postgresql:9.1-901.jdbc4'
+        testCompile 'com.h2database:h2:1.4.193'
         testCompile "com.mchange:c3p0:$c3p0Version"
 
         testCompile "org.slf4j:slf4j-log4j12:$slf4jVersion"
@@ -320,7 +321,7 @@ project(':projects:copper-cassandra:cassandra-storage') {
        	compile "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion"
         
         testCompile "org.slf4j:slf4j-log4j12:$slf4jVersion"
-        testCompile 'org.cassandraunit:cassandra-unit:3.3.0.2'
+        testCompile 'org.cassandraunit:cassandra-unit:3.1.1.0'
 //        testCompile 'io.netty:netty-all:4.0.27.Final'
     } 
 }
@@ -349,7 +350,7 @@ project(':projects:copper-spring') {
 
         // Spring
         compile "org.springframework:spring-aop:$springVersion"
-        compile "org.springframework:spring-asm:3.1.4.RELEASE"
+        compile "org.springframework:spring-asm:$springVersion"
         compile "org.springframework:spring-beans:$springVersion"
         compile "org.springframework:spring-context:$springVersion"
         compile "org.springframework:spring-core:$springVersion"
@@ -357,7 +358,7 @@ project(':projects:copper-spring') {
         compile "org.springframework:spring-jdbc:$springVersion"
         compile "org.springframework:spring-tx:$springVersion"
 
-        compile 'org.springframework.batch:spring-batch-infrastructure:3.0.8.RELEASE'
+        compile 'org.springframework.batch:spring-batch-infrastructure:2.1.8.RELEASE'
     }
 }
 
@@ -365,9 +366,6 @@ project(':projects:copper-spring') {
 project(':projects:copper-coreengine') {
     dependencies {
         compile project(':projects:copper-jmx-interface')
-
-        // https://mvnrepository.com/artifact/javax.xml.bind/jaxb-api
-        compile group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.0'
 
         // asm
         compile "org.ow2.asm:asm:$asmVersion"
@@ -402,9 +400,9 @@ project(':projects:copper-performance-test') {
         
 	compile "com.google.guava:guava:$guavaVersion"
     	compile 'mysql:mysql-connector-java:5.1.39'
-    	compile 'org.apache.derby:derby:10.14.1.0'
-    	compile 'postgresql:postgresql:9.1-901-1.jdbc4'
-    	compile 'com.h2database:h2:1.4.196'
+    	compile 'org.apache.derby:derby:10.13.1.1'
+    	compile 'postgresql:postgresql:9.1-901.jdbc4'
+    	compile 'com.h2database:h2:1.4.193'
     	compile "com.mchange:c3p0:$c3p0Version"
     	compile "org.slf4j:slf4j-log4j12:$slf4jVersion"
     	compile "org.slf4j:slf4j-api:$slf4jVersion"
