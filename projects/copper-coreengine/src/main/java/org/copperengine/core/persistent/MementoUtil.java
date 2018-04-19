@@ -101,7 +101,7 @@ public class MementoUtil {
             Entry<Object, Object[]> en = i.next();
             final Object[] mementoSlot = en.getValue();
             Object mementoObject = mementoSlot[0];
-            pc.getPersister(Object.class).select(mementoObject, new PostSelectedCallback<>() {
+            pc.getPersister(Object.class).select(mementoObject, new PostSelectedCallback<Object>() {
                 @Override
                 public void entitySelected(Object e) {
                     mementoSlot[0] = MementoUtil.this.clone(e);
