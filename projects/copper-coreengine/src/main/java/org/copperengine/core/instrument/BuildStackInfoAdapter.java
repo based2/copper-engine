@@ -47,7 +47,7 @@ public class BuildStackInfoAdapter extends MethodVisitor implements Opcodes, Byt
     MethodVisitor delegate;
 
     public BuildStackInfoAdapter(String classType, boolean isStatic, String methodName, String arguments, String extendedArguments) {
-        super(ASM4);
+        super(ASM5);
         int i = 0;
         Type[] argumentTypes = Type.getArgumentTypes(arguments);
         currentFrame = new StackInfo();
@@ -546,7 +546,7 @@ public class BuildStackInfoAdapter extends MethodVisitor implements Opcodes, Byt
     }
 
     @Override
-    public void visitMethodInsn(int arg0, String arg1, String arg2, String arg3) {
+    public void visitMethodInsn(int arg0, String arg1, String arg2, String arg3, boolean itf) {
         savePreviousFrame();
         Type deferredReturnType = deferReturnType(arg3);
         switch (arg0) {
@@ -568,7 +568,7 @@ public class BuildStackInfoAdapter extends MethodVisitor implements Opcodes, Byt
         }
         if (logger.isDebugEnabled())
             logger.debug("methodInsn " + getOpCode(arg0) + " " + arg1 + " " + arg2 + " " + arg3);
-        delegate.visitMethodInsn(arg0, arg1, arg2, arg3);
+        delegate.visitMethodInsn(arg0, arg1, arg2, arg3, itf);
     }
 
     @Override
