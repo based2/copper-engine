@@ -19,7 +19,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -52,20 +52,20 @@ public class StandardJavaSerializerCompatibilityTest {
         StandardJavaSerializer standardJavaSerializer = new StandardJavaSerializer();
 
         FileBasedWorkflowRepository wfRepo = new FileBasedWorkflowRepository();
-        wfRepo.setSourceDirs(Arrays.asList(new String[] { "src/workflow/java" }));
+        wfRepo.setSourceDirs(Collections.singletonList("src/workflow/java"));
         wfRepo.setTargetDir("build/compiled_workflow");
         wfRepo.start();
         try {
             ZipEntry zipEntry;
             while ((zipEntry = zipIS.getNextEntry()) != null) {
-                if (zipEntry.getName().indexOf("workflow_") != -1 && zipEntry.getName().endsWith(".state")) {
+                if (zipEntry.getName().contains("workflow_") && zipEntry.getName().endsWith(".state")) {
                     // System.out.println("Checking " + zipEntry.getName());
                     SerializedWorkflow sw = new SerializedWorkflow();
                     sw.setObjectState(readFile(zipIS));
                     // sw.setData(readFile(new File(directory, f.getName().replace(".state", ".data"))));
                     Workflow<?> wf = standardJavaSerializer.deserializeWorkflow(sw, wfRepo);
                     org.junit.Assert.assertNotNull(wf);
-                } else if (zipEntry.getName().indexOf("response_") != -1) {
+                } else if (zipEntry.getName().contains("response_")) {
                     // System.out.println("Checking " + zipEntry.getName());
                     Response<?> r = standardJavaSerializer.deserializeResponse(readFile(zipIS));
                     org.junit.Assert.assertNotNull(r);

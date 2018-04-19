@@ -28,7 +28,7 @@ public class CommonSQLHelper {
             }
             if (filter.getCreationTS().getTo() != null) {
                 sql.append(" AND x.CREATION_TS < ?");
-                params.add(filter.getCreationTS().getTo());
+                params.add(new Date(filter.getCreationTS().getTo().getTime()));
             }
         }
         if (filter.getLastModTS() != null) {
@@ -49,24 +49,23 @@ public class CommonSQLHelper {
         if (filter.getStates() != null && !filter.getStates().isEmpty()) {
             List<String> filterStates = new ArrayList<>();
             if (filter.getStates().contains(ProcessingState.ENQUEUED.name())) {
-                filterStates.add("" + DBProcessingState.ENQUEUED.ordinal());
+                filterStates.add(Integer.toString(DBProcessingState.ENQUEUED.ordinal()));
             }
             if (filter.getStates().contains(ProcessingState.ERROR.name())) {
-                filterStates.add("" + DBProcessingState.ERROR.ordinal());
+                filterStates.add(Integer.toString(DBProcessingState.ERROR.ordinal()));
             }
             if (filter.getStates().contains(ProcessingState.WAITING.name())) {
-                filterStates.add("" + DBProcessingState.WAITING.ordinal());
+                filterStates.add(Integer.toString(DBProcessingState.WAITING.ordinal()));
             }
             if (filter.getStates().contains(ProcessingState.INVALID.name())) {
-                filterStates.add("" + DBProcessingState.INVALID.ordinal());
+                filterStates.add(Integer.toString(DBProcessingState.INVALID.ordinal()));
             }
             if (filter.getStates().contains(ProcessingState.FINISHED.name())) {
-                filterStates.add("" + DBProcessingState.FINISHED.ordinal());
+                filterStates.add(Integer.toString(DBProcessingState.FINISHED.ordinal()));
             }
 
-
             if (!filterStates.isEmpty()) {
-                sql.append(" AND x.STATE in (" + String.join(", ", Collections.nCopies(filterStates.size(), "?"))  + ")");
+                sql.append(" AND x.STATE in (").append(String.join(", ", Collections.nCopies(filterStates.size(), "?"))).append(")");
                 params.addAll(filterStates);
             }
         }
@@ -75,9 +74,9 @@ public class CommonSQLHelper {
 
     public static List<Workflow<?>> processResult(String sql, List<Object> params, String sqlQueryErrorData, Connection con, FunctionWithException<ResultSet, PersistentWorkflow<?>> decode) throws SQLException {
         final List<Workflow<?>> result = new ArrayList<>();
-        try (PreparedStatement pStmtQueryWFIs = con.prepareStatement(sql.toString()); PreparedStatement pStmtQueryErrorData = con.prepareStatement(sqlQueryErrorData)) {
-            for (int i=1; i<=params.size(); i++) {
-                pStmtQueryWFIs.setObject(i, params.get(i-1));
+        try (PreparedStatement pStmtQueryWFIs = con.prepareStatement(sql); PreparedStatement pStmtQueryErrorData = con.prepareStatement(sqlQueryErrorData)) {
+            for (int i = 1; i <= params.size(); i++) {
+                pStmtQueryWFIs.setObject(i, params.get(i - 1));
             }
             ResultSet rs = pStmtQueryWFIs.executeQuery();
             while (rs.next()) {
@@ -105,8 +104,8 @@ public class CommonSQLHelper {
 
     public static int processCountResult(StringBuilder sql, List<Object> params, Connection con) throws SQLException {
         try (PreparedStatement pStmtQueryWFIs = con.prepareStatement(sql.toString())) {
-            for (int i=1; i<=params.size(); i++) {
-                pStmtQueryWFIs.setObject(i, params.get(i-1));
+            for (int i = 1; i <= params.size(); i++) {
+                pStmtQueryWFIs.setObject(i, params.get(i - 1));
             }
             ResultSet rs = pStmtQueryWFIs.executeQuery();
             while (rs.next()) {

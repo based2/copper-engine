@@ -33,7 +33,7 @@ public class StandardJavaSerializerTest {
         StringBuilder dataSB = new StringBuilder(SIZE);
         for (int i = 0; i < SIZE; i++) {
             int pos = (int) (Math.random() * 70.0);
-            dataSB.append("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890!§$%&/()=?".substring(pos, pos + 1));
+            dataSB.append("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890!§$%&/()=?", pos, pos + 1);
         }
         final String data = dataSB.toString();
 

@@ -21,12 +21,7 @@ public class EngineStarter {
         final LoadTestCassandraEngineFactory factory = new LoadTestCassandraEngineFactory();
         try {
             factory.getEngine().startup();
-            Runtime.getRuntime().addShutdownHook(new Thread() {
-                @Override
-                public void run() {
-                    factory.destroyEngine();
-                }
-            });
+            Runtime.getRuntime().addShutdownHook(new Thread(factory::destroyEngine));
         } catch (Exception e) {
             e.printStackTrace();
         }
